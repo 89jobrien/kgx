@@ -1,4 +1,8 @@
+use std::fmt;
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 use uuid::Uuid;
 
 /// Retrieval constraints.
@@ -81,6 +85,77 @@ impl WikiCategory {
             Self::Entity => "entity",
             Self::Topic => "topic",
         }
+    }
+}
+
+impl fmt::Display for WikiCategory {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_dir())
+    }
+}
+
+impl FromStr for WikiCategory {
+    type Err = WikiCategoryParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "summary" => Ok(Self::Summary),
+            "entity" => Ok(Self::Entity),
+            "topic" => Ok(Self::Topic),
+            _ => Err(WikiCategoryParseError(s.to_string())),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Error)]
+#[error("unknown category: {0} (expected summary|entity|topic)")]
+pub struct WikiCategoryParseError(pub String);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wiki_category_from_str_valid() {
+        assert_eq!(
+            "summary".parse::<WikiCategory>().unwrap(),
+            WikiCategory::Summary
+        );
+        assert_eq!(
+            "entity".parse::<WikiCategory>().unwrap(),
+            WikiCategory::Entity
+        );
+        assert_eq!(
+            "topic".parse::<WikiCategory>().unwrap(),
+            WikiCategory::Topic
+        );
+    }
+
+    #[test]
+    fn from_str_rejects_invalid_category() {
+        let err = WikiCategory::from_str("bogus").unwrap_err();
+        assert!(err.to_string().contains("bogus"));
+        assert!(err.to_string().contains("expected"));
+    }
+
+    #[test]
+    fn wiki_category_display_roundtrip() {
+        for cat in [
+            WikiCategory::Summary,
+            WikiCategory::Entity,
+            WikiCategory::Topic,
+        ] {
+            let s = cat.to_string();
+            let parsed: WikiCategory = s.parse().expect("roundtrip should work");
+            assert_eq!(parsed, cat);
+        }
+    }
+
+    #[test]
+    fn wiki_category_as_dir() {
+        assert_eq!(WikiCategory::Summary.as_dir(), "summary");
+        assert_eq!(WikiCategory::Entity.as_dir(), "entity");
+        assert_eq!(WikiCategory::Topic.as_dir(), "topic");
     }
 }
 

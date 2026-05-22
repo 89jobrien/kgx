@@ -16,3 +16,5 @@ thiserror = "2"
 anyhow = "1"
 uuid = { version = "1", features = ["v4", "serde"] }
 clap = { version = "4", features = ["derive"] }
+proptest = "1"
+assert_cmd = "2"
