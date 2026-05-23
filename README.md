@@ -2,59 +2,104 @@
 
 Three-layer knowledge graph toolkit in Rust.
 
-## Layers
+JSON-backed, zero-dependency storage. No external database required --
+entities, relations, documents, and wiki pages all persist as plain files.
 
-| Layer           | Storage               | Purpose                                                           |
-| --------------- | --------------------- | ----------------------------------------------------------------- |
-| **Raw Sources** | `data/documents.json` | Immutable document store with chunking and provenance             |
-| **Graph**       | `data/graph.json`     | Entity-relation graph with BFS traversal and confidence filtering |
-| **Wiki**        | `wiki/`               | Markdown pages with `[[wikilinks]]`, search, and lint             |
+## Architecture
 
-## Usage
+```
+                    +-----------------+
+                    |    kgx-cli      |  CLI binary
+                    +--------+--------+
+                             |
+          +------------------+------------------+
+          |                  |                  |
+  +-------+------+  +-------+-------+  +-------+------+
+  | GraphStore   |  | DocumentStore |  | WikiStore    |
+  | graph.json   |  | documents.json|  | wiki/        |
+  +--------------+  +---------------+  +--------------+
+  BFS traversal     Chunking &         Markdown pages
+  Confidence filter Provenance         [[wikilinks]]
+```
+
+| Layer         | Storage               | Purpose                                             |
+| ------------- | --------------------- | --------------------------------------------------- |
+| **Graph**     | `data/graph.json`     | Entity-relation graph, BFS traversal, confidence    |
+| **Documents** | `data/documents.json` | Immutable document store with chunking & provenance |
+| **Wiki**      | `wiki/`               | Markdown pages with `[[wikilinks]]`, search, lint   |
+
+## Quick Start
+
+```bash
+# Initialize a workspace
+kgx --root ./my-kb init
+
+# Add entities and relations
+kgx --root ./my-kb graph add-node "Rust" --type language
+kgx --root ./my-kb graph add-node "Memory Safety" --type concept
+kgx --root ./my-kb graph add-edge "Rust" "Memory Safety" \
+    --type enables --confidence 0.95
+
+# Ingest a document with entities and relations
+kgx --root ./my-kb ingest --file notes.json
+
+# Search the graph
+kgx --root ./my-kb graph search "Rust"
+
+# Write and search wiki pages
+kgx --root ./my-kb wiki write --category entity --title "Rust" \
+    --summary "A systems language" < rust.md
+kgx --root ./my-kb wiki search "memory"
+
+# Lint for broken wikilinks
+kgx --root ./my-kb wiki lint
+
+# Workspace stats
+kgx --root ./my-kb stats
+```
+
+## Library Usage
 
 ```rust
 use kgx::{GraphStore, DocumentStore, WikiStore, WikiCategory};
 
-// Open stores (creates files if they don't exist)
 let mut graph = GraphStore::open("data/graph.json")?;
 let mut docs = DocumentStore::open("data/documents.json")?;
 let wiki = WikiStore::open("wiki/")?;
 
-// Ingest a document
-docs.ingest("doc_001", "Incident Report", "report.md",
-    "System crashes due to memory leaks.");
-
 // Build the graph
 let leak = graph.add_node("memory leak", "issue",
-    Some("memory leaks cause crashes"), Some("doc_001"));
+    Some("causes crashes"), Some("doc_001"));
 let crash = graph.add_node("system crash", "issue",
-    Some("system crashes due to memory leaks"), Some("doc_001"));
-graph.add_edge(leak, crash, "causes", 1.0, Some("crashes due to memory leaks"), Some("doc_001"));
+    Some("system crashes"), Some("doc_001"));
+graph.add_edge(leak, crash, "causes", 1.0,
+    Some("crashes due to memory leaks"), Some("doc_001"));
 
-// Query via BFS
+// BFS traversal
 let (nodes, edges) = graph.bfs_subgraph(leak);
 
-// Write a wiki page
+// Wiki with wikilinks and lint
 wiki.write_page(WikiCategory::Summary, "Incident Report",
-    "# Incident Report\n\n[[memory-leak]] causes [[system-crash]].",
-    "Memory leaks cause system crashes.")?;
-
-// Search the wiki
-let hits = wiki.search("memory")?;
-
-// Lint for broken links and orphan pages
+    "# Report\n\n[[memory-leak]] causes [[system-crash]].",
+    "Summary of the incident.")?;
 let report = wiki.lint()?;
 
-// Persist
 graph.save()?;
 docs.save()?;
 ```
 
 ## Retrieval Constraints
 
-- **MAX_GRAPH_DEPTH** = 2 — BFS traversal limit
-- **MIN_CONFIDENCE** = 0.6 — edges below this threshold are rejected
-- **MAX_NODES** = 50 — maximum nodes returned per query
+| Constant          | Value | Purpose                       |
+| ----------------- | ----- | ----------------------------- |
+| `MAX_GRAPH_DEPTH` | 2     | BFS traversal limit           |
+| `MIN_CONFIDENCE`  | 0.6   | Edges below this are rejected |
+| `MAX_NODES`       | 50    | Max nodes returned per query  |
+
+## Code Quality
+
+100% [rustqual](https://github.com/89jobrien/checkup) score across all
+six dimensions: IOSP, Complexity, DRY, SRP, Coupling, Test Quality.
 
 ## License
 
