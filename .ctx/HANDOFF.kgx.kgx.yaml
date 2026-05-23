@@ -1,0 +1,17 @@
+project: kgx
+updated: "20260522.200246"
+
+items: []
+
+log:
+  - session: 1
+    date: "20260522.200246"
+    summary: >
+      Refactored kgx workspace from 44% to 100% rustqual quality score. Extracted ingest
+      logic, path helpers, and WikiCategory::FromStr from CLI binary to lib crate. Separated
+      I/O from logic in graph/document/wiki stores (IOSP). Split CLI tests into modules.
+      Added thiserror, rustqual.toml config, and unit tests. Created rustqual Claude Code skill
+      with SKILL.md and three reference docs. Ran skill eval: 94% with-skill vs 27% baseline.
+    commits:
+      - sha: "938d44f"
+        branch: main
