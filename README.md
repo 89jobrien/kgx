@@ -30,31 +30,40 @@ entities, relations, documents, and wiki pages all persist as plain files.
 
 ## Quick Start
 
-```bash
-# Initialize a workspace
-kgx --root ./my-kb init
 
-# Add entities and relations
+### Initialize a workspace
+```bash
+kgx --root ./my-kb init
+```
+### Add entities and relations
+
+```bash
 kgx --root ./my-kb graph add-node "Rust" --type language
 kgx --root ./my-kb graph add-node "Memory Safety" --type concept
 kgx --root ./my-kb graph add-edge "Rust" "Memory Safety" \
     --type enables --confidence 0.95
-
-# Ingest a document with entities and relations
+```
+### Ingest a document with entities and relations
+```bash
 kgx --root ./my-kb ingest --file notes.json
-
-# Search the graph
+```
+### Search the graph
+```bash
 kgx --root ./my-kb graph search "Rust"
+```
 
-# Write and search wiki pages
+### Write and search wiki pages
+```
 kgx --root ./my-kb wiki write --category entity --title "Rust" \
     --summary "A systems language" < rust.md
 kgx --root ./my-kb wiki search "memory"
-
-# Lint for broken wikilinks
+```
+### Lint for broken wikilinks
+```bash
 kgx --root ./my-kb wiki lint
-
-# Workspace stats
+```
+### Workspace stats
+```bash
 kgx --root ./my-kb stats
 ```
 
