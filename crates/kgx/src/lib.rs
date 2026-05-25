@@ -5,6 +5,8 @@ pub mod export;
 pub mod graph;
 pub mod ingest;
 pub mod init;
+pub mod ops;
+pub mod parse;
 pub mod types;
 pub mod wiki;
 
@@ -13,6 +15,10 @@ pub use export::{ExportContext, Exporter, GfmExporter, JsonExporter, MarkdownExp
 pub use graph::{EdgeInput, GraphStore};
 pub use ingest::{IngestEntity, IngestRelation, ingest_entities, ingest_relations};
 pub use init::init_workspace;
+pub use ops::GraphOp;
+pub use ops::merge::{MergeOp, MergeSummary};
+pub use parse::markdown::MarkdownParser;
+pub use parse::{ParseError, ParsedDocument, ParsedEntity, ParsedRelation, Parser};
 pub use types::{
     Chunk, ChunkId, DocId, Document, EdgeId, Entity, LintReport, MAX_GRAPH_DEPTH, MAX_NODES,
     MIN_CONFIDENCE, NodeId, QueryResult, Relation, WikiCategory, WikiCategoryParseError, WikiPage,
