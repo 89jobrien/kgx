@@ -275,7 +275,8 @@ fn cmd_export(root: &Path, format: &str, output: &Path) -> Result<()> {
     let exporter: Box<dyn kgx::Exporter> = match format {
         "json" => Box::new(kgx::JsonExporter),
         "markdown" | "md" => Box::new(kgx::MarkdownExporter),
-        other => anyhow::bail!("unknown format: {other} (expected json or markdown)"),
+        "gfm" => Box::new(kgx::GfmExporter),
+        other => anyhow::bail!("unknown format: {other} (expected json, markdown, or gfm)"),
     };
 
     exporter.export(&ctx, output)?;

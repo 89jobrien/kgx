@@ -269,6 +269,7 @@ mod tests {
     use super::*;
     use crate::types::WikiCategory;
     use crate::{DocumentStore, EdgeInput, GraphStore, WikiStore};
+    use proptest::prelude::*;
     use uuid::Uuid;
 
     fn test_dir() -> String {
@@ -371,6 +372,113 @@ mod tests {
         assert!(content.contains("## Chunks"));
 
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn entity_file_with_no_relations() {
+        let dir = test_dir();
+        let mut graph = GraphStore::open(format!("{dir}/graph.json")).expect("graph");
+        graph.add_node("Lonely", "concept", Some("No relations"), None);
+        let docs = DocumentStore::open(format!("{dir}/docs.json")).expect("docs");
+        let wiki = WikiStore::open(format!("{dir}/wiki")).expect("wiki");
+
+        let ctx = ExportContext {
+            graph: &graph,
+            docs: &docs,
+            wiki: &wiki,
+        };
+        let out = format!("{dir}/output");
+        MarkdownExporter
+            .export(&ctx, Path::new(&out))
+            .expect("export");
+
+        let content = std::fs::read_to_string(format!("{out}/entities/lonely.md")).expect("read");
+        assert!(content.starts_with("---\n"));
+        assert!(content.contains("# Lonely"));
+        assert!(content.contains("No relations"));
+        assert!(
+            !content.contains("## Relations"),
+            "should not have relations section"
+        );
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn wiki_file_has_backlinks() {
+        let dir = test_dir();
+        let (graph, docs, wiki) = setup_stores(&dir);
+        let ctx = ExportContext {
+            graph: &graph,
+            docs: &docs,
+            wiki: &wiki,
+        };
+        let out = format!("{dir}/output");
+        MarkdownExporter
+            .export(&ctx, Path::new(&out))
+            .expect("export");
+
+        let content = std::fs::read_to_string(format!("{out}/wiki/entity/rust.md")).expect("read");
+        assert!(content.contains("## Backlinks"));
+        assert!(content.contains("[[entities/rust|Rust]]"));
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // Property: exporting any entity name produces a valid file that starts
+    // with YAML frontmatter and contains the entity name as a heading.
+    proptest! {
+        #[test]
+        fn entity_file_always_has_valid_frontmatter(
+            name in "[a-zA-Z0-9 ]{1,30}",
+            etype in "[a-z]{1,10}",
+        ) {
+            let dir = test_dir();
+            let mut graph = GraphStore::open(format!("{dir}/graph.json")).expect("graph");
+            graph.add_node(&name, &etype, Some("test text"), None);
+            let docs = DocumentStore::open(format!("{dir}/docs.json")).expect("docs");
+            let wiki = WikiStore::open(format!("{dir}/wiki")).expect("wiki");
+
+            let ctx = ExportContext { graph: &graph, docs: &docs, wiki: &wiki };
+            let out = format!("{dir}/output");
+            MarkdownExporter.export(&ctx, Path::new(&out)).expect("export should not panic");
+
+            let slug = slugify(&name);
+            if !slug.is_empty() {
+                let path = format!("{out}/entities/{slug}.md");
+                let content = std::fs::read_to_string(&path)
+                    .unwrap_or_else(|_| panic!("file should exist: {path}"));
+                prop_assert!(content.starts_with("---\n"), "must start with frontmatter");
+                prop_assert!(content.contains("---\n\n#"), "must have closing frontmatter + heading");
+            }
+
+            let _ = std::fs::remove_dir_all(&dir);
+        }
+
+        #[test]
+        fn index_file_entity_count_matches(
+            count in 1usize..6,
+        ) {
+            let dir = test_dir();
+            let mut graph = GraphStore::open(format!("{dir}/graph.json")).expect("graph");
+            for i in 0..count {
+                graph.add_node(&format!("entity{i}"), "t", None, None);
+            }
+            let docs = DocumentStore::open(format!("{dir}/docs.json")).expect("docs");
+            let wiki = WikiStore::open(format!("{dir}/wiki")).expect("wiki");
+
+            let ctx = ExportContext { graph: &graph, docs: &docs, wiki: &wiki };
+            let out = format!("{dir}/output");
+            MarkdownExporter.export(&ctx, Path::new(&out)).expect("export");
+
+            let content = std::fs::read_to_string(format!("{out}/index.md")).expect("read");
+            prop_assert!(
+                content.contains(&format!("Entities: {count}")),
+                "index should report correct entity count"
+            );
+
+            let _ = std::fs::remove_dir_all(&dir);
+        }
     }
 
     #[test]

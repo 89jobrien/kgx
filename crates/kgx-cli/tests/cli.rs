@@ -249,6 +249,110 @@ mod docs {
     }
 }
 
+mod export {
+    use super::*;
+
+    fn setup_populated_workspace(root: &str) {
+        init_workspace(root);
+        let input = serde_json::json!({
+            "doc_id": "d1",
+            "title": "Test Doc",
+            "source": "test.md",
+            "raw_content": "Alpha and Beta.",
+            "entities": [
+                {"name": "Alpha", "type": "concept"},
+                {"name": "Beta", "type": "concept"}
+            ],
+            "relations": [
+                {"source": "Alpha", "target": "Beta", "type": "related", "confidence": 0.9}
+            ]
+        });
+        kgx()
+            .args(["--root", root, "ingest"])
+            .write_stdin(serde_json::to_string(&input).unwrap())
+            .assert()
+            .success();
+    }
+
+    #[test]
+    fn export_gfm() {
+        let root = temp_root();
+        setup_populated_workspace(&root);
+        let out = format!("{root}/gfm-out");
+
+        kgx()
+            .args([
+                "--root", &root, "export", "--format", "gfm", "--output", &out,
+            ])
+            .assert()
+            .success()
+            .stdout(predicate::str::contains("Exported gfm"));
+
+        let content = fs::read_to_string(format!("{out}/kgx-export.md")).expect("read export");
+        assert!(content.contains("# kgx Export"));
+        assert!(content.contains("| Entities | 2 |"));
+        assert!(content.contains("| Alpha | concept |"));
+        assert!(content.contains("| Alpha | related | Beta |"));
+
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn export_json() {
+        let root = temp_root();
+        setup_populated_workspace(&root);
+        let out = format!("{root}/json-out");
+
+        kgx()
+            .args([
+                "--root", &root, "export", "--format", "json", "--output", &out,
+            ])
+            .assert()
+            .success();
+
+        let content = fs::read_to_string(format!("{out}/kgx-export.json")).expect("read");
+        let v: serde_json::Value = serde_json::from_str(&content).expect("parse");
+        assert_eq!(v["entities"].as_array().unwrap().len(), 2);
+
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn export_markdown() {
+        let root = temp_root();
+        setup_populated_workspace(&root);
+        let out = format!("{root}/md-out");
+
+        kgx()
+            .args([
+                "--root", &root, "export", "--format", "markdown", "--output", &out,
+            ])
+            .assert()
+            .success();
+
+        assert!(std::path::Path::new(&format!("{out}/index.md")).exists());
+        assert!(std::path::Path::new(&format!("{out}/entities")).is_dir());
+
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn export_unknown_format_fails() {
+        let root = temp_root();
+        init_workspace(&root);
+
+        kgx()
+            .args([
+                "--root", &root, "export", "--format", "csv", "--output", "/tmp/x",
+            ])
+            .assert()
+            .failure()
+            .stderr(predicate::str::contains("unknown format"));
+
+        let _ = fs::remove_dir_all(&root);
+    }
+}
+
 mod wiki {
     use super::*;
 

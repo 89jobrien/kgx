@@ -1,0 +1,3 @@
+[tasks.release]
+description = "Build kgx-cli in release mode"
+run = "cargo build --release -p kgx-cli"
