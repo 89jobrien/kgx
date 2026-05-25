@@ -1,4 +1,7 @@
+pub mod diff;
 pub mod merge;
+pub mod stats;
+pub mod subgraph;
 
 use crate::GraphStore;
 

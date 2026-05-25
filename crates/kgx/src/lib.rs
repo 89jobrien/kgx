@@ -16,8 +16,14 @@ pub use graph::{EdgeInput, GraphStore};
 pub use ingest::{IngestEntity, IngestRelation, ingest_entities, ingest_relations};
 pub use init::init_workspace;
 pub use ops::GraphOp;
+pub use ops::diff::{DiffOp, EdgeDiff, GraphDiff};
 pub use ops::merge::{MergeOp, MergeSummary};
+pub use ops::stats::{DegreeCentrality, GraphStats, StatsOp};
+pub use ops::subgraph::{Subgraph, SubgraphOp, SubgraphPredicate};
+pub use parse::csv::CsvParser;
+pub use parse::dot::DotParser;
 pub use parse::markdown::MarkdownParser;
+pub use parse::yaml::YamlParser;
 pub use parse::{ParseError, ParsedDocument, ParsedEntity, ParsedRelation, Parser};
 pub use types::{
     Chunk, ChunkId, DocId, Document, EdgeId, Entity, LintReport, MAX_GRAPH_DEPTH, MAX_NODES,

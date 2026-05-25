@@ -1,4 +1,7 @@
+pub mod csv;
+pub mod dot;
 pub mod markdown;
+pub mod yaml;
 
 /// A parsed entity, ready for ingestion.
 #[derive(Debug, Clone, PartialEq, Eq)]
