@@ -18,8 +18,8 @@ entities, relations, documents, and wiki pages all persist as plain files.
   | GraphStore   |  | DocumentStore |  | WikiStore    |
   | graph.json   |  | documents.json|  | wiki/        |
   +--------------+  +---------------+  +--------------+
-  BFS traversal     Chunking &         Markdown pages
-  Confidence filter Provenance         [[wikilinks]]
+   BFS traversal       Chunking &       Markdown pages
+   Confidence filter    Provenance       [[wikilinks]]
 ```
 
 | Layer         | Storage               | Purpose                                             |
