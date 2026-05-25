@@ -38,6 +38,7 @@ fn main() -> Result<()> {
         Cmd::Graph(sub) => cmd_graph(root, sub),
         Cmd::Wiki(sub) => cmd_wiki(root, sub),
         Cmd::Docs(sub) => cmd_docs(root, sub),
+        Cmd::Export { format, output } => cmd_export(root, &format, &output),
         Cmd::Stats => cmd_stats(root),
     }
 }
@@ -257,6 +258,35 @@ fn cmd_docs(root: &Path, sub: DocsCmd) -> Result<()> {
             println!("{}", serde_json::to_string_pretty(&chunks)?);
         }
     }
+    Ok(())
+}
+
+fn cmd_export(root: &Path, format: &str, output: &Path) -> Result<()> {
+    let graph = GraphStore::open(graph_path(root))?;
+    let docs = DocumentStore::open(docs_path(root))?;
+    let wiki = WikiStore::open(wiki_path(root))?;
+
+    let ctx = kgx::ExportContext {
+        graph: &graph,
+        docs: &docs,
+        wiki: &wiki,
+    };
+
+    let exporter: Box<dyn kgx::Exporter> = match format {
+        "json" => Box::new(kgx::JsonExporter),
+        "markdown" | "md" => Box::new(kgx::MarkdownExporter),
+        other => anyhow::bail!("unknown format: {other} (expected json or markdown)"),
+    };
+
+    exporter.export(&ctx, output)?;
+    println!(
+        "Exported {} to {}",
+        format,
+        output
+            .canonicalize()
+            .unwrap_or_else(|_| output.to_path_buf())
+            .display()
+    );
     Ok(())
 }
 

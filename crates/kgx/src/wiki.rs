@@ -163,6 +163,39 @@ impl WikiStore {
         Ok(())
     }
 
+    /// Iterate all wiki pages as structured `WikiPage` values.
+    pub fn pages(&self) -> anyhow::Result<Vec<WikiPage>> {
+        let mut result = Vec::new();
+        for cat_str in CATEGORIES {
+            let cat: WikiCategory = cat_str.parse().expect("static category");
+            let dir = self.root.join(cat_str);
+            if !dir.exists() {
+                continue;
+            }
+            for entry in fs::read_dir(&dir)? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.extension().is_none_or(|e| e != "md") {
+                    continue;
+                }
+                let slug = path
+                    .file_stem()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string();
+                let content = fs::read_to_string(&path)?;
+                result.push(WikiPage {
+                    slug,
+                    category: cat.clone(),
+                    title: capitalize(cat_str),
+                    content,
+                    summary: String::new(),
+                });
+            }
+        }
+        Ok(result)
+    }
+
     /// Lint the wiki for broken wikilinks, orphan pages, etc.
     pub fn lint(&self) -> anyhow::Result<LintReport> {
         let pages = self.iter_pages()?;
@@ -204,7 +237,7 @@ pub struct WikiSearchHit {
     pub snippet: String,
 }
 
-fn slugify(title: &str) -> String {
+pub fn slugify(title: &str) -> String {
     title
         .to_lowercase()
         .chars()
@@ -423,6 +456,18 @@ mod tests {
         assert!(report.missing_pages.contains(&"missing-page".to_string()));
         assert!(report.orphan_pages.contains(&"orphan".to_string()));
         assert!(report.isolated_pages.contains(&"orphan".to_string()));
+    }
+
+    #[test]
+    fn pages_returns_all_wiki_pages() {
+        let (wiki, dir) = fresh_wiki();
+        wiki.write_page(WikiCategory::Entity, "Rust", "content", "sum")
+            .expect("write");
+        wiki.write_page(WikiCategory::Topic, "Build", "content", "sum")
+            .expect("write");
+        let pages = wiki.pages().expect("pages");
+        assert_eq!(pages.len(), 2);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     // Property: slugify is idempotent.

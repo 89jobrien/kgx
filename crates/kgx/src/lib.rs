@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 pub mod document;
+pub mod export;
 pub mod graph;
 pub mod ingest;
 pub mod init;
@@ -8,6 +9,7 @@ pub mod types;
 pub mod wiki;
 
 pub use document::DocumentStore;
+pub use export::{ExportContext, Exporter, JsonExporter, MarkdownExporter};
 pub use graph::{EdgeInput, GraphStore};
 pub use ingest::{IngestEntity, IngestRelation, ingest_entities, ingest_relations};
 pub use init::init_workspace;
@@ -15,7 +17,7 @@ pub use types::{
     Chunk, ChunkId, DocId, Document, EdgeId, Entity, LintReport, MAX_GRAPH_DEPTH, MAX_NODES,
     MIN_CONFIDENCE, NodeId, QueryResult, Relation, WikiCategory, WikiCategoryParseError, WikiPage,
 };
-pub use wiki::WikiStore;
+pub use wiki::{WikiStore, slugify};
 
 /// Standard path for the graph store within a workspace root.
 pub fn graph_path(root: &Path) -> PathBuf {

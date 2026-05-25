@@ -33,6 +33,15 @@ pub enum Cmd {
     /// Document store operations
     #[command(subcommand)]
     Docs(DocsCmd),
+    /// Export the full context graph
+    Export {
+        /// Output format: json or markdown
+        #[arg(long)]
+        format: String,
+        /// Output directory
+        #[arg(long)]
+        output: PathBuf,
+    },
     /// Show stats
     Stats,
 }

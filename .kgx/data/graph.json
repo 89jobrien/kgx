@@ -1,0 +1,510 @@
+{
+  "nodes": [
+    {
+      "id": "81f458dc-86e8-4929-9809-eba78f0ac1f9",
+      "name": "BFS traversal",
+      "type": "algorithm",
+      "supporting_text": "Breadth-first subgraph extraction from seed node, respecting MAX_GRAPH_DEPTH, MIN_CONFIDENCE, MAX_NODES",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "6f3eb9f8-f811-49cc-b52c-be875752f6de",
+      "name": "Chunk",
+      "type": "type",
+      "supporting_text": "A chunk of a document used for provenance, with id, doc_id, text, offset",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "317c292f-982c-4c44-acd3-3893ffbe9978",
+      "name": "Document",
+      "type": "type",
+      "supporting_text": "A raw ingested document with id, title, source, raw_content, and chunks",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "name": "DocumentStore",
+      "type": "component",
+      "supporting_text": "Persistent raw document store backed by JSON file, with chunking and provenance",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "bc288617-c791-49d0-aee3-4d36200214f6",
+      "name": "Entity",
+      "type": "type",
+      "supporting_text": "An entity node in the knowledge graph with id, name, type, supporting_text, source_docs",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "db8c0b8d-e3b1-453a-bf1b-12304112fdb2",
+      "name": "ExportContext",
+      "type": "component",
+      "supporting_text": "Bundles all three stores for format-agnostic export",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "781c1b94-e00c-4b43-bffc-63b2f4304eea",
+      "name": "Exporter trait",
+      "type": "interface",
+      "supporting_text": "Format-agnostic export interface implemented by JsonExporter and MarkdownExporter",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "name": "GraphStore",
+      "type": "component",
+      "supporting_text": "Persistent entity-relation graph backed by JSON file, supports BFS traversal and confidence filtering",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "ef4f5cbc-fa71-4215-a26b-dc10d9cdc729",
+      "name": "JsonExporter",
+      "type": "component",
+      "supporting_text": "Exports full context graph as single kgx-export.json",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "ed9e554c-c859-4b63-b084-b88dafa481d0",
+      "name": "LintReport",
+      "type": "type",
+      "supporting_text": "Wiki lint results: orphan_pages, missing_pages, broken_wikilinks, isolated_pages",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "f940fe8f-d8ee-47bf-b168-537fedb54aad",
+      "name": "MarkdownExporter",
+      "type": "component",
+      "supporting_text": "Exports as Obsidian-compatible vault with frontmatter and wikilinks",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "b381ffcc-5b2f-444e-9c54-a108045bef43",
+      "name": "QueryResult",
+      "type": "type",
+      "supporting_text": "Result of a graph query with nodes, edges, and supporting_chunks for provenance",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "9d872472-4e2c-4f36-af15-c3c4df67cda3",
+      "name": "Relation",
+      "type": "type",
+      "supporting_text": "A directed relation between two entities with confidence score and provenance",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "4fd60d04-ec28-4b28-bfa7-83c7b9d0e1cc",
+      "name": "WikiCategory",
+      "type": "type",
+      "supporting_text": "Enum: Summary, Entity, Topic — categories for wiki pages",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "84881ebf-941b-4e14-81d2-bafe55352671",
+      "name": "WikiPage",
+      "type": "type",
+      "supporting_text": "A wiki page stored as markdown with slug, category, title, content, summary",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "name": "WikiStore",
+      "type": "component",
+      "supporting_text": "Manages directory of markdown wiki pages with wikilink cross-references, search, and lint",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "20eb76a9-a317-4ade-a1eb-c18ec4b437cd",
+      "name": "chunking",
+      "type": "algorithm",
+      "supporting_text": "Splits documents into overlapping chunks (1000 chars, 200 overlap) for provenance",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "30aaa325-bd9d-422a-9f03-434ce0cc91d2",
+      "name": "documents.json",
+      "type": "storage",
+      "supporting_text": "JSON file storing all raw documents and their chunks",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "58f7d822-e270-4eaa-9bde-c6e930776de3",
+      "name": "graph.json",
+      "type": "storage",
+      "supporting_text": "JSON file storing all entity nodes and relation edges",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "e9493d4f-ac13-4e62-9944-ddaa2c505a8d",
+      "name": "ingest pipeline",
+      "type": "process",
+      "supporting_text": "CLI reads JSON from stdin, stores document with chunks, adds entities and relations to graph",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "1d9e8a53-8be0-413d-80b1-33e134492a09",
+      "name": "kgx",
+      "type": "project",
+      "supporting_text": "Three-layer knowledge graph toolkit in Rust",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "name": "kgx library",
+      "type": "crate",
+      "supporting_text": "Library crate with GraphStore, DocumentStore, WikiStore, and export modules",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "94e195cb-b846-4817-a86c-1b18a07f08c8",
+      "name": "kgx-cli",
+      "type": "crate",
+      "supporting_text": "CLI binary crate providing kgx command-line interface",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "4af3208b-0486-45ea-8feb-7568c4eb21e8",
+      "name": "slugify",
+      "type": "function",
+      "supporting_text": "Converts titles to URL-safe slugs, idempotent, no consecutive hyphens",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "0b18b27f-5a9b-49a9-8ede-e376732bc9c8",
+      "name": "wiki directory",
+      "type": "storage",
+      "supporting_text": "Directory of markdown files organized by category: summary/, entity/, topic/",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    },
+    {
+      "id": "5156ef05-dd44-4364-b278-0a97a863218d",
+      "name": "wikilink parser",
+      "type": "algorithm",
+      "supporting_text": "Extracts [[wikilink]] targets from markdown content for cross-referencing and lint",
+      "source_docs": [
+        "kgx-codebase"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "f55b19d9-0cfa-4c66-934f-53c623a5c6ca",
+      "source": "1d9e8a53-8be0-413d-80b1-33e134492a09",
+      "target": "94e195cb-b846-4817-a86c-1b18a07f08c8",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "workspace contains kgx-cli binary crate",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "62bda5cf-3416-4344-9976-9d0eabc1fe80",
+      "source": "1d9e8a53-8be0-413d-80b1-33e134492a09",
+      "target": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "workspace contains kgx library crate",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "5d435062-e2ee-4f15-b79b-77d73885b7ab",
+      "source": "94e195cb-b846-4817-a86c-1b18a07f08c8",
+      "target": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "type": "depends_on",
+      "confidence": 1.0,
+      "supporting_text": "CLI crate imports and uses kgx library",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "9ec4023e-556e-49c3-8177-154d8843722c",
+      "source": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "target": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "library exposes GraphStore via graph module",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "8ef7bc4a-83b0-4c83-8482-909506e6a009",
+      "source": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "target": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "library exposes DocumentStore via document module",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "28481c34-8633-4b8c-ab4d-c742537abdd1",
+      "source": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "target": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "library exposes WikiStore via wiki module",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "8faf54bb-a691-40c3-928d-ef0e122c92f1",
+      "source": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "target": "db8c0b8d-e3b1-453a-bf1b-12304112fdb2",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "library exposes ExportContext via export module",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "a57894d0-4d91-4066-be38-d6e1e3c184cb",
+      "source": "c2e0d962-b193-451d-bb50-5ff3fd98d5fb",
+      "target": "781c1b94-e00c-4b43-bffc-63b2f4304eea",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "library defines Exporter trait in export module",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "0f53cf45-dc4f-42fe-8d83-259021ab29ef",
+      "source": "ef4f5cbc-fa71-4215-a26b-dc10d9cdc729",
+      "target": "781c1b94-e00c-4b43-bffc-63b2f4304eea",
+      "type": "implements",
+      "confidence": 1.0,
+      "supporting_text": "JsonExporter implements Exporter trait",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "466b6a5a-01a6-4979-8d6e-6d9a595e7368",
+      "source": "f940fe8f-d8ee-47bf-b168-537fedb54aad",
+      "target": "781c1b94-e00c-4b43-bffc-63b2f4304eea",
+      "type": "implements",
+      "confidence": 1.0,
+      "supporting_text": "MarkdownExporter implements Exporter trait",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "7740b84e-db5d-45b1-a212-16f54b53f398",
+      "source": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "target": "bc288617-c791-49d0-aee3-4d36200214f6",
+      "type": "stores",
+      "confidence": 1.0,
+      "supporting_text": "GraphStore stores Entity nodes in a HashMap",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "a07a39be-63cc-4651-9e53-03358fb056cb",
+      "source": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "target": "9d872472-4e2c-4f36-af15-c3c4df67cda3",
+      "type": "stores",
+      "confidence": 1.0,
+      "supporting_text": "GraphStore stores Relation edges in a Vec",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "616dc94e-8699-4a70-9d63-a99b96a5c2cb",
+      "source": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "target": "58f7d822-e270-4eaa-9bde-c6e930776de3",
+      "type": "persists_to",
+      "confidence": 1.0,
+      "supporting_text": "GraphStore persists to data/graph.json",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "c19045c8-902c-4750-abab-caf47a0a9fce",
+      "source": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "target": "317c292f-982c-4c44-acd3-3893ffbe9978",
+      "type": "stores",
+      "confidence": 1.0,
+      "supporting_text": "DocumentStore stores Document objects in a HashMap",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "fe064d61-6e57-4801-876d-89053fcbaf6a",
+      "source": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "target": "30aaa325-bd9d-422a-9f03-434ce0cc91d2",
+      "type": "persists_to",
+      "confidence": 1.0,
+      "supporting_text": "DocumentStore persists to data/documents.json",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "df22a535-8847-41ae-a50c-8acfbe095b04",
+      "source": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "target": "84881ebf-941b-4e14-81d2-bafe55352671",
+      "type": "manages",
+      "confidence": 1.0,
+      "supporting_text": "WikiStore manages WikiPage objects as markdown files",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "0b634878-0c7c-49a0-a0d4-38df92a1f6be",
+      "source": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "target": "0b18b27f-5a9b-49a9-8ede-e376732bc9c8",
+      "type": "persists_to",
+      "confidence": 1.0,
+      "supporting_text": "WikiStore persists pages to wiki/ directory",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "bdef9b99-1085-4035-a9d8-b695a0206eff",
+      "source": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "target": "81f458dc-86e8-4929-9809-eba78f0ac1f9",
+      "type": "uses",
+      "confidence": 1.0,
+      "supporting_text": "GraphStore.bfs_subgraph implements BFS traversal",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "eef561a1-be07-4753-828c-e57d7e802f05",
+      "source": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "target": "20eb76a9-a317-4ade-a1eb-c18ec4b437cd",
+      "type": "uses",
+      "confidence": 1.0,
+      "supporting_text": "DocumentStore.ingest uses chunk_text for chunking",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "5343b4c3-e585-4fcf-ba4b-6b3f541a5124",
+      "source": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "target": "5156ef05-dd44-4364-b278-0a97a863218d",
+      "type": "uses",
+      "confidence": 1.0,
+      "supporting_text": "WikiStore lint uses extract_wikilinks",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "8f5430b0-3ba2-4770-b66b-73de9164851c",
+      "source": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "target": "ed9e554c-c859-4b63-b084-b88dafa481d0",
+      "type": "produces",
+      "confidence": 1.0,
+      "supporting_text": "WikiStore.lint returns LintReport",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "492152fe-f509-4b51-874e-fe9d572cc2d9",
+      "source": "317c292f-982c-4c44-acd3-3893ffbe9978",
+      "target": "6f3eb9f8-f811-49cc-b52c-be875752f6de",
+      "type": "contains",
+      "confidence": 1.0,
+      "supporting_text": "Document contains Vec<Chunk>",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "970a750b-00af-4ca6-8edb-e7ba5be4ba08",
+      "source": "84881ebf-941b-4e14-81d2-bafe55352671",
+      "target": "4fd60d04-ec28-4b28-bfa7-83c7b9d0e1cc",
+      "type": "has_category",
+      "confidence": 1.0,
+      "supporting_text": "WikiPage has a WikiCategory field",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "8ecd2321-f783-45c2-ab8e-b19ba34e463f",
+      "source": "bc288617-c791-49d0-aee3-4d36200214f6",
+      "target": "9d872472-4e2c-4f36-af15-c3c4df67cda3",
+      "type": "connected_by",
+      "confidence": 1.0,
+      "supporting_text": "Entity nodes are connected by Relation edges",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "fa2ce725-fccf-4f17-a4dc-c7a6acdb4787",
+      "source": "e9493d4f-ac13-4e62-9944-ddaa2c505a8d",
+      "target": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "type": "writes_to",
+      "confidence": 1.0,
+      "supporting_text": "ingest pipeline stores raw document via DocumentStore",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "ae2bfc65-d4e8-4fb8-8269-6fc585745fcc",
+      "source": "e9493d4f-ac13-4e62-9944-ddaa2c505a8d",
+      "target": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "type": "writes_to",
+      "confidence": 1.0,
+      "supporting_text": "ingest pipeline adds entities and relations to GraphStore",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "e5ae430c-f6a8-48bb-aaeb-98ba25054e31",
+      "source": "db8c0b8d-e3b1-453a-bf1b-12304112fdb2",
+      "target": "521893ed-b98f-4aad-9f90-e7ea92a3fda3",
+      "type": "references",
+      "confidence": 1.0,
+      "supporting_text": "ExportContext bundles a reference to GraphStore",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "87537a62-54c7-4162-910b-20b966191ee9",
+      "source": "db8c0b8d-e3b1-453a-bf1b-12304112fdb2",
+      "target": "0d0be3b3-3085-48de-9801-d0720d32e7fe",
+      "type": "references",
+      "confidence": 1.0,
+      "supporting_text": "ExportContext bundles a reference to DocumentStore",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "6b9be772-0400-4004-a46e-a04f2d7aaf62",
+      "source": "db8c0b8d-e3b1-453a-bf1b-12304112fdb2",
+      "target": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "type": "references",
+      "confidence": 1.0,
+      "supporting_text": "ExportContext bundles a reference to WikiStore",
+      "source_doc": "kgx-codebase"
+    },
+    {
+      "id": "9730769e-cb9e-4f6b-942f-4bb38a357c16",
+      "source": "7c792f60-78f9-407e-8ec4-4743f3dc5000",
+      "target": "4af3208b-0486-45ea-8feb-7568c4eb21e8",
+      "type": "uses",
+      "confidence": 1.0,
+      "supporting_text": "WikiStore uses slugify for page file naming",
+      "source_doc": "kgx-codebase"
+    }
+  ]
+}

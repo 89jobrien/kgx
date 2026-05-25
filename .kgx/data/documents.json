@@ -1,0 +1,24 @@
+{
+  "documents": [
+    {
+      "id": "kgx-codebase",
+      "title": "kgx — Three-layer knowledge graph toolkit",
+      "source": "/Users/joe/dev/kgx",
+      "raw_content": "kgx is a three-layer knowledge graph toolkit in Rust. It provides JSON-backed, zero-dependency storage for entities, relations, documents, and wiki pages as plain files. The workspace contains two crates: kgx (library) and kgx-cli (binary). The library exposes four modules: types (core types like Entity, Relation, Document, Chunk, WikiPage), graph (entity-relation graph with JSON persistence, BFS traversal, confidence filtering), document (raw document store with chunking and provenance), wiki (markdown wiki pages with wikilink cross-references, search, and lint), and export (JSON and Markdown exporters). The CLI provides subcommands: init, ingest, query, graph (add-node, add-edge, search), wiki (write, read, search, list, lint), docs (list, search), export, and stats. Retrieval constraints: MAX_GRAPH_DEPTH=2, MIN_CONFIDENCE=0.6, MAX_NODES=50. Storage: data/graph.json for entities and relations, data/documents.json for raw documents and chunks, wiki/ for markdown pages organized by category (summary, entity, topic). The export module supports JSON (single kgx-export.json) and Markdown (Obsidian-compatible vault with frontmatter). Dependencies: serde, serde_json, thiserror, anyhow, uuid, clap. Test dependencies: proptest, assert_cmd. Rust edition 2024, license MIT OR Apache-2.0, author Joseph O'Brien. Code quality: 100% rustqual score across IOSP, Complexity, DRY, SRP, Coupling, Test Quality dimensions.",
+      "chunks": [
+        {
+          "id": "604f4ebf-261f-4066-ad27-7f6443d43ed9",
+          "doc_id": "kgx-codebase",
+          "text": "kgx is a three-layer knowledge graph toolkit in Rust. It provides JSON-backed, zero-dependency storage for entities, relations, documents, and wiki pages as plain files. The workspace contains two crates: kgx (library) and kgx-cli (binary). The library exposes four modules: types (core types like Entity, Relation, Document, Chunk, WikiPage), graph (entity-relation graph with JSON persistence, BFS traversal, confidence filtering), document (raw document store with chunking and provenance), wiki (markdown wiki pages with wikilink cross-references, search, and lint), and export (JSON and Markdown exporters). The CLI provides subcommands: init, ingest, query, graph (add-node, add-edge, search), wiki (write, read, search, list, lint), docs (list, search), export, and stats. Retrieval constraints: MAX_GRAPH_DEPTH=2, MIN_CONFIDENCE=0.6, MAX_NODES=50. Storage: data/graph.json for entities and relations, data/documents.json for raw documents and chunks, wiki/ for markdown pages organized by cat",
+          "offset": 0
+        },
+        {
+          "id": "92add7fc-97fa-4a06-94a8-686128d3adf1",
+          "doc_id": "kgx-codebase",
+          "text": "s: MAX_GRAPH_DEPTH=2, MIN_CONFIDENCE=0.6, MAX_NODES=50. Storage: data/graph.json for entities and relations, data/documents.json for raw documents and chunks, wiki/ for markdown pages organized by category (summary, entity, topic). The export module supports JSON (single kgx-export.json) and Markdown (Obsidian-compatible vault with frontmatter). Dependencies: serde, serde_json, thiserror, anyhow, uuid, clap. Test dependencies: proptest, assert_cmd. Rust edition 2024, license MIT OR Apache-2.0, author Joseph O'Brien. Code quality: 100% rustqual score across IOSP, Complexity, DRY, SRP, Coupling, Test Quality dimensions.",
+          "offset": 800
+        }
+      ]
+    }
+  ]
+}

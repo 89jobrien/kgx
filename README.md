@@ -27,6 +27,7 @@ entities, relations, documents, and wiki pages all persist as plain files.
 | **Graph**     | `data/graph.json`     | Entity-relation graph, BFS traversal, confidence    |
 | **Documents** | `data/documents.json` | Immutable document store with chunking & provenance |
 | **Wiki**      | `wiki/`               | Markdown pages with `[[wikilinks]]`, search, lint   |
+| **Export**    | (output dir)          | JSON or Markdown export of the full context graph   |
 
 ## Quick Start
 
@@ -62,6 +63,15 @@ kgx --root ./my-kb wiki search "memory"
 ```bash
 kgx --root ./my-kb wiki lint
 ```
+
+### Export
+```bash
+kgx --root ./my-kb export --format json --output ./export
+
+# Export as Obsidian-compatible markdown vault
+kgx --root ./my-kb export --format markdown --output ./vault
+```
+
 ### Workspace stats
 ```bash
 kgx --root ./my-kb stats
@@ -96,6 +106,30 @@ let report = wiki.lint()?;
 graph.save()?;
 docs.save()?;
 ```
+
+## Export
+
+`kgx export` serializes the full context graph (entities, relations,
+documents, wiki pages) to a target directory.
+
+| Format     | Output                                         |
+| ---------- | ---------------------------------------------- |
+| `json`     | Single `kgx-export.json` with all layers       |
+| `markdown` | Obsidian-compatible vault with `[[wikilinks]]` |
+
+The markdown export creates:
+
+```
+output/
+  entities/       # One .md per entity with frontmatter, relations, chunks
+  documents/      # One .md per document with chunk boundaries
+  wiki/           # Mirrors wiki category structure with backlinks
+  index.md        # Stats and links to all pages
+```
+
+Entity files include YAML frontmatter, relation links, inlined source
+chunks, and cross-references to wiki pages -- ready to open as an
+Obsidian vault.
 
 ## Retrieval Constraints
 
