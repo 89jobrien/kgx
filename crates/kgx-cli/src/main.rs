@@ -33,7 +33,11 @@ fn main() -> Result<()> {
 
     match cli.cmd {
         Cmd::Init => cmd_init(root),
-        Cmd::Ingest => cmd_ingest(root),
+        Cmd::Ingest {
+            format,
+            github,
+            github_layer,
+        } => cmd_ingest(root, &format, github.as_deref(), &github_layer),
         Cmd::Query { name } => cmd_query(root, &name),
         Cmd::Graph(sub) => cmd_graph(root, sub),
         Cmd::Wiki(sub) => cmd_wiki(root, sub),
@@ -54,23 +58,8 @@ fn cmd_init(root: &Path) -> Result<()> {
     Ok(())
 }
 
-fn cmd_ingest(root: &Path) -> Result<()> {
-    let input: IngestInput =
-        serde_json::from_str(&read_stdin()?).context("parsing ingest JSON from stdin")?;
-
-    let mut graph = GraphStore::open(graph_path(root))?;
-    let mut docs = DocumentStore::open(docs_path(root))?;
-
-    let chunk_count = docs
-        .ingest(
-            &input.doc_id,
-            &input.title,
-            &input.source,
-            &input.raw_content,
-        )
-        .chunks
-        .len();
-    let entities: Vec<_> = input
+fn ingest_parsed_doc(graph: &mut GraphStore, doc: &kgx::ParsedDocument) -> Result<(usize, usize)> {
+    let entities: Vec<_> = doc
         .entities
         .iter()
         .map(|e| IngestEntity {
@@ -79,7 +68,7 @@ fn cmd_ingest(root: &Path) -> Result<()> {
             supporting_text: e.supporting_text.as_deref(),
         })
         .collect();
-    let relations: Vec<_> = input
+    let relations: Vec<_> = doc
         .relations
         .iter()
         .map(|r| IngestRelation {
@@ -90,20 +79,103 @@ fn cmd_ingest(root: &Path) -> Result<()> {
             supporting_text: r.supporting_text.as_deref(),
         })
         .collect();
-    let nodes_added = kgx::ingest_entities(&mut graph, &input.doc_id, &entities);
-    let edges_added = kgx::ingest_relations(&mut graph, &input.doc_id, &relations)
+    let nodes_added = kgx::ingest_entities(graph, &doc.doc_id, &entities);
+    let edges_added = kgx::ingest_relations(graph, &doc.doc_id, &relations)
         .map_err(|e| anyhow::anyhow!("{e}"))?;
+    Ok((nodes_added, edges_added))
+}
 
-    graph.save()?;
-    docs.save()?;
+fn cmd_ingest(root: &Path, format: &str, github: Option<&str>, github_layer: &str) -> Result<()> {
+    let mut graph = GraphStore::open(graph_path(root))?;
 
-    let out = IngestOutput {
-        doc_id: input.doc_id,
-        chunk_count,
-        nodes_added,
-        edges_added,
-    };
-    println!("{}", serde_json::to_string_pretty(&out)?);
+    if let Some(owner_repo) = github {
+        use kgx::{GitHubSource, Layer, Source};
+        let layer: Layer = github_layer
+            .parse()
+            .map_err(|e: String| anyhow::anyhow!("{e}"))?;
+        let source = GitHubSource::new(owner_repo, layer);
+        let docs = source.fetch().map_err(|e| anyhow::anyhow!("{e}"))?;
+        let mut total_nodes = 0;
+        let mut total_edges = 0;
+        for doc in &docs {
+            let (n, e) = ingest_parsed_doc(&mut graph, doc)?;
+            total_nodes += n;
+            total_edges += e;
+        }
+        graph.save()?;
+        let out = IngestOutput {
+            doc_id: format!("github:{owner_repo}"),
+            chunk_count: 0,
+            nodes_added: total_nodes,
+            edges_added: total_edges,
+        };
+        println!("{}", serde_json::to_string_pretty(&out)?);
+        return Ok(());
+    }
+
+    match format {
+        "github" => {
+            let input_str = read_stdin()?;
+            let doc = kgx::Parser::parse(&kgx::GitHubParser, &input_str, "github:stdin")
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+            let (nodes_added, edges_added) = ingest_parsed_doc(&mut graph, &doc)?;
+            graph.save()?;
+            let out = IngestOutput {
+                doc_id: doc.doc_id,
+                chunk_count: 0,
+                nodes_added,
+                edges_added,
+            };
+            println!("{}", serde_json::to_string_pretty(&out)?);
+        }
+        _ => {
+            let mut docs_store = DocumentStore::open(docs_path(root))?;
+            let input: IngestInput =
+                serde_json::from_str(&read_stdin()?).context("parsing ingest JSON from stdin")?;
+            let chunk_count = docs_store
+                .ingest(
+                    &input.doc_id,
+                    &input.title,
+                    &input.source,
+                    &input.raw_content,
+                )
+                .chunks
+                .len();
+            let doc = kgx::ParsedDocument {
+                doc_id: input.doc_id.clone(),
+                entities: input
+                    .entities
+                    .iter()
+                    .map(|e| kgx::ParsedEntity {
+                        name: e.name.clone(),
+                        entity_type: e.entity_type.clone(),
+                        supporting_text: e.supporting_text.clone(),
+                    })
+                    .collect(),
+                relations: input
+                    .relations
+                    .iter()
+                    .map(|r| kgx::ParsedRelation {
+                        source: r.source.clone(),
+                        target: r.target.clone(),
+                        relation_type: r.relation_type.clone(),
+                        confidence: r.confidence,
+                        supporting_text: r.supporting_text.clone(),
+                    })
+                    .collect(),
+            };
+            let (nodes_added, edges_added) = ingest_parsed_doc(&mut graph, &doc)?;
+            graph.save()?;
+            docs_store.save()?;
+            let out = IngestOutput {
+                doc_id: input.doc_id,
+                chunk_count,
+                nodes_added,
+                edges_added,
+            };
+            println!("{}", serde_json::to_string_pretty(&out)?);
+        }
+    }
     Ok(())
 }
 

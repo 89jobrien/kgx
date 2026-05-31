@@ -17,8 +17,18 @@ pub struct Cli {
 pub enum Cmd {
     /// Initialize a new kgx workspace
     Init,
-    /// Ingest a document with entities and relations (JSON on stdin)
-    Ingest,
+    /// Ingest a document with entities and relations
+    Ingest {
+        /// Input format: json (default) or github
+        #[arg(long, default_value = "json")]
+        format: String,
+        /// Fetch directly from GitHub (e.g. owner/repo)
+        #[arg(long)]
+        github: Option<String>,
+        /// GitHub extraction layer: metadata, docs, deps, issues
+        #[arg(long, default_value = "metadata")]
+        github_layer: String,
+    },
     /// Query the graph by seed entity name
     Query {
         /// Entity name to start BFS from

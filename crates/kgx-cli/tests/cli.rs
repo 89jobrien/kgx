@@ -418,6 +418,38 @@ mod wiki {
     }
 
     #[test]
+    fn ingest_format_github_from_stdin() {
+        let root = temp_root();
+        init_workspace(&root);
+
+        let json = r#"{
+            "full_name": "test/repo",
+            "description": "A test repo",
+            "owner": { "login": "test", "type": "User" },
+            "topics": ["kgx"],
+            "language": "Rust",
+            "license": { "spdx_id": "MIT" }
+        }"#;
+
+        kgx()
+            .args(["--root", &root, "ingest", "--format", "github"])
+            .write_stdin(json)
+            .assert()
+            .success()
+            .stdout(
+                predicate::str::contains("test/repo").or(predicate::str::contains("github:stdin")),
+            );
+
+        kgx()
+            .args(["--root", &root, "query", "test/repo"])
+            .assert()
+            .success()
+            .stdout(predicate::str::contains("test/repo"));
+
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
     fn read_missing_page_fails() {
         let root = temp_root();
         init_workspace(&root);

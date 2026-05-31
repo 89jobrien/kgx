@@ -7,6 +7,7 @@ pub mod ingest;
 pub mod init;
 pub mod ops;
 pub mod parse;
+pub mod source;
 pub mod types;
 pub mod wiki;
 
@@ -22,9 +23,12 @@ pub use ops::stats::{DegreeCentrality, GraphStats, StatsOp};
 pub use ops::subgraph::{Subgraph, SubgraphOp, SubgraphPredicate};
 pub use parse::csv::CsvParser;
 pub use parse::dot::DotParser;
+pub use parse::github::GitHubParser;
 pub use parse::markdown::MarkdownParser;
 pub use parse::yaml::YamlParser;
 pub use parse::{ParseError, ParsedDocument, ParsedEntity, ParsedRelation, Parser};
+pub use source::github::{GitHubSource, Layer};
+pub use source::{Source, SourceError};
 pub use types::{
     Chunk, ChunkId, DocId, Document, EdgeId, Entity, LintReport, MAX_GRAPH_DEPTH, MAX_NODES,
     MIN_CONFIDENCE, NodeId, QueryResult, Relation, WikiCategory, WikiCategoryParseError, WikiPage,
