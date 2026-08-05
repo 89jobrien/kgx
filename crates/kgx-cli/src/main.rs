@@ -5,7 +5,7 @@ use std::io::Read as _;
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 use kgx::{
     DocumentStore, EdgeInput, GraphStore, IngestEntity, IngestRelation, WikiCategory, WikiStore,
     docs_path, graph_path, wiki_path,
@@ -28,7 +28,18 @@ fn read_stdin() -> Result<String> {
 }
 
 fn main() -> Result<()> {
+    if std::env::args().nth(1).as_deref() == Some("completions") {
+        clap_complete::generate(
+            clap_complete_nushell::Nushell,
+            &mut Cli::command(),
+            "kgx",
+            &mut std::io::stdout(),
+        );
+        return Ok(());
+    }
+
     let cli = Cli::parse();
+
     let root = &cli.root;
 
     match cli.cmd {
